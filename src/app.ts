@@ -10,7 +10,7 @@ app.use("/api/v1", routerV1);
 app.use(errorHandler);
 
 app.get("/health", (req: Request, res: Response) => {
-  res.json({ healthCheck: "Success" });
+  res.status(200).json({ healthCheck: "Success" });
 });
 
 export default app;

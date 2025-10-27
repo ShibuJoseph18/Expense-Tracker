@@ -14,6 +14,7 @@ authRouter.post(
   validatePayload(registerSchema),
   registerController
 );
+
 authRouter.post("/login", validatePayload(loginSchema), loginController);
 
 export default authRouter;
