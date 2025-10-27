@@ -82,9 +82,9 @@ ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE user_categories 
 ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP;
 
--- ALTER transacations
-ALTER TABLE transactions 
+-- ALTER User SubCategories
+ALTER TABLE user_subcategories
 ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP;
 
-ALTER TABLE transactions 
+ALTER TABLE user_subcategories 
 ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP;
