@@ -8,10 +8,12 @@ export const errorMapper = (err: any) => {
   if (
     err instanceof ValidationError ||
     err instanceof UnauthorizedError ||
-    err instanceof ConflictError
+    err instanceof ConflictError ||
+    err instanceof ServerError
   ) {
     return err;
   }
 
+  console.log(err)
   return new ServerError();
 };

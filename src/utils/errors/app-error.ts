@@ -5,7 +5,6 @@ export class AppError extends Error {
   error: any;
 
   constructor(message: string, statusCode = 500, error: CustomError) {
-    console.log("calle1", message, statusCode, error);
     super(message);
     this.name = this.constructor.name;
     this.error = error;
