@@ -32,8 +32,7 @@ CREATE TABLE IF NOT EXISTS categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     type TEXT CHECK (type IN ('expense', 'income')) NOT NULL,
-    is_global BOOLEAN DEFAULT 1,          -- 1 = system category, 0 = user-defined
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    is_global BOOLEAN DEFAULT 1        -- 1 = system category, 0 = user-defined
 );
 
 CREATE TABLE IF NOT EXISTS user_categories (
@@ -50,8 +49,7 @@ CREATE TABLE IF NOT EXISTS subcategories (
     category_id INTEGER NOT NULL,
     name TEXT NOT NULL,
     is_global BOOLEAN DEFAULT 1,
-    FOREIGN KEY (category_id) REFERENCES categories(id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
 CREATE TABLE IF NOT EXISTS user_subcategories (
