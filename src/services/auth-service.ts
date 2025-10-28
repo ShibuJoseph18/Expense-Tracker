@@ -6,7 +6,7 @@ import config from "../config/config.js";
 import { ConflictError } from "../utils/errors/conflict-error.js";
 import type { RegisterType, LoginType } from "../types/auth-types.js";
 import { ServerError } from "../utils/errors/server-error.js";
-import { isValidPassword } from "../utils/helper.js";
+import { isValidPassword } from "../utils/helpers/auth-helper.js";
 
 export const registerService = async (userCreationInput: RegisterType) => {
   const hashed_password = await bcrypt.hash(
@@ -39,6 +39,21 @@ export const registerService = async (userCreationInput: RegisterType) => {
     throw new ServerError();
   }
 
+  await db.run(
+    `INSERT INTO user_categories (user_id, category_id)
+     SELECT $userId, id
+     FROM categories
+     WHERE is_global = 1`,
+    { $userId: newUser.id }
+  );
+
+  await db.run(
+    `INSERT INTO user_subcategories (user_id, subcategory_id)
+     SELECT $userId, id
+     FROM subcategories
+     WHERE is_global = 1`,
+    { $userId: newUser.id }
+  );
   return newUser;
 };
 

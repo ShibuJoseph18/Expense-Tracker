@@ -1,8 +1,10 @@
 import app from "./app.js";
 import config from "./config/config.js";
+import { initializeTablesAndDefaultData } from "./config/db-config.js";
 
 async function startServer() {
   try {
+    await initializeTablesAndDefaultData();
     // Start Express server
     app.listen(config.port, () => {
       console.log(`Server running on http://localhost:${config.port}`);
