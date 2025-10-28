@@ -15,8 +15,11 @@ export let db: any;
     driver: sqlite3.cached.Database,
   });
 
-  const sqlPath = path.join(__dirname, "..", "db", "tables.sql");
-  const sql = fs.readFileSync(sqlPath, "utf8");
-  await db.exec(sql);
+  const sqlPath = path.join(__dirname, "..", "db/sql");
+  const tablesSql = fs.readFileSync(`${sqlPath}/tables.sql`, "utf8");
+  await db.exec(tablesSql);
   console.log("✅ Tables created successfully");
+  const seedSql = fs.readFileSync(`${sqlPath}/seed.sql`, "utf8");
+  await db.exec(seedSql);
+  console.log("✅ Seeding finished successfully");
 })();
