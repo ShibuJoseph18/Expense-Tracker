@@ -39,6 +39,21 @@ export const registerService = async (userCreationInput: RegisterType) => {
     throw new ServerError();
   }
 
+  await db.run(
+    `INSERT INTO user_categories (user_id, category_id)
+     SELECT $userId, id
+     FROM categories
+     WHERE is_global = 1`,
+    { $userId: newUser.id }
+  );
+
+  await db.run(
+    `INSERT INTO user_subcategories (user_id, subcategory_id)
+     SELECT $userId, id
+     FROM subcategories
+     WHERE is_global = 1`,
+    { $userId: newUser.id }
+  );
   return newUser;
 };
 
