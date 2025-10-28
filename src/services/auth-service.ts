@@ -7,6 +7,9 @@ import { ConflictError } from "../utils/errors/conflict-error.js";
 import type { RegisterType, LoginType } from "../types/auth-types.js";
 import { ServerError } from "../utils/errors/server-error.js";
 import { isValidPassword } from "../utils/helpers/auth-helper.js";
+import { intializeDefaultCategoriesService } from "./category-service.js";
+import { intializeDefaultSubCategoriesService } from "./subcategory-service.js";
+import { intializeCashBalanceService } from "./cash-service.js";
 
 export const registerService = async (userCreationInput: RegisterType) => {
   const hashed_password = await bcrypt.hash(
@@ -39,21 +42,27 @@ export const registerService = async (userCreationInput: RegisterType) => {
     throw new ServerError();
   }
 
-  await db.run(
-    `INSERT INTO user_categories (user_id, category_id)
-     SELECT $userId, id
-     FROM categories
-     WHERE is_global = 1`,
-    { $userId: newUser.id }
+  const userCategories = await intializeDefaultCategoriesService(
+    insertNewUser.lastID as number
   );
+  if (!userCategories) {
+    throw new ServerError();
+  }
 
-  await db.run(
-    `INSERT INTO user_subcategories (user_id, subcategory_id)
-     SELECT $userId, id
-     FROM subcategories
-     WHERE is_global = 1`,
-    { $userId: newUser.id }
+  const userSubCategories = await intializeDefaultSubCategoriesService(
+    insertNewUser.lastID as number
   );
+  if (!userSubCategories) {
+    throw new ServerError();
+  }
+
+  const userCashBalance = await intializeCashBalanceService(
+    insertNewUser.lastID as number
+  );
+  if (!userCashBalance) {
+    throw new ServerError();
+  }
+
   return newUser;
 };
 
