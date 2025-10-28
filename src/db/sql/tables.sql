@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS accounts (
     bank_name TEXT,
     account_number TEXT,
     balance REAL DEFAULT 0,
+    initial_deposit BOOLEAN 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
@@ -22,6 +23,7 @@ CREATE TABLE IF NOT EXISTS accounts (
 
 CREATE TABLE IF NOT EXISTS cash_balances (
     user_id INTEGER PRIMARY KEY,
+    initial_deposit BOOLEAN 0,
     balance REAL DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
