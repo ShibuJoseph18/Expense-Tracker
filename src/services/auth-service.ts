@@ -6,7 +6,7 @@ import config from "../config/config.js";
 import { ConflictError } from "../utils/errors/conflict-error.js";
 import type { RegisterType, LoginType } from "../types/auth-types.js";
 import { ServerError } from "../utils/errors/server-error.js";
-import { isValidPassword } from "../utils/helper.js";
+import { isValidPassword } from "../utils/helpers/auth-helper.js";
 
 export const registerService = async (userCreationInput: RegisterType) => {
   const hashed_password = await bcrypt.hash(
