@@ -98,3 +98,11 @@ export const loginService = async (userCredentials: LoginType) => {
   });
   return { existingUserInfo, accessToken };
 };
+
+export const getUserById = async (id: number) => {
+  console.log(id)
+  const existingUser = await db.get(`SELECT * FROM users WHERE id = $id`, {
+    $id: id,
+  });
+  return existingUser;
+};
