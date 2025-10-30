@@ -1,10 +1,14 @@
 import jwt from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
-import type { ResolveFnOutput } from "module";
-
 import config from "../config/config.js";
 import { UnauthorizedError } from "../utils/errors/unauthorized-error.js";
-export const verifyJwt = (req: Request, res: Response, next: NextFunction) => {
+import { getUserById } from "../services/auth-service.js";
+
+export const verifyJwt = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const jwtHeader = req.header("authorization");
   if (!jwtHeader) {
     return;
@@ -14,15 +18,22 @@ export const verifyJwt = (req: Request, res: Response, next: NextFunction) => {
     throw new Error("Token missing Bearer");
   }
   const jwtToken = jwtHeader.replace("Bearer ", "");
-  jwt.verify(jwtToken, config.jwtSecretKey, (err, decodedToken) => {
-    if (err) {
-      if (err instanceof jwt.TokenExpiredError) {
-        throw new UnauthorizedError("Token Expired");
-      }
-      throw new UnauthorizedError("Invalid token");
+  let decodedToken: any;
+  try {
+    decodedToken = jwt.verify(jwtToken, config.jwtSecretKey);
+  } catch (err: any) {
+    if (err instanceof jwt.TokenExpiredError) {
+      throw new UnauthorizedError("Token Expired", 401);
     }
-    req.jwtToken = decodedToken;
-  });
+    throw new UnauthorizedError("Invalid token", 401);
+  }
+
+  const user = await getUserById(decodedToken.id);
+  if (!user) {
+    throw new UnauthorizedError("User doesn't exist", 401);
+  }
+
+  req.accessToken = decodedToken;
 
   return next();
 };
