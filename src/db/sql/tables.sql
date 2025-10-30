@@ -13,17 +13,18 @@ CREATE TABLE IF NOT EXISTS accounts (
     user_id INTEGER NOT NULL,
     name TEXT NOT NULL,        -- e.g. "HDFC Bank", "SBI Account"
     bank_name TEXT,
-    account_number TEXT,
+    account_number TEXT UNIQUE,
     balance REAL DEFAULT 0,
-    initial_deposit BOOLEAN 0,
+    initial_deposit BOOLEAN DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, name),
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS cash_balances (
     user_id INTEGER PRIMARY KEY,
-    initial_deposit BOOLEAN 0,
+    initial_deposit BOOLEAN DEFAULT 0,
     balance REAL DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
