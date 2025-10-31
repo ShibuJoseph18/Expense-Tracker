@@ -6,6 +6,7 @@ export const createAccountController = async (req: Request, res: Response) => {
     req.accessToken.id,
     req.validatedReqBody
   );
+
   res.status(200).json({
     message: "Account created successfully",
     account: newAccount,
