@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     date DATETIME DEFAULT CURRENT_TIMESTAMP, 
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    deleted BOOLEAN DEFAULT 0,
     FOREIGN KEY(user_id) REFERENCES users(id),
     FOREIGN KEY(account_id) REFERENCES accounts(id),
     FOREIGN KEY(category_id) REFERENCES category(id),
