@@ -2,7 +2,8 @@ import jwt from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
 import config from "../config/config.js";
 import { UnauthorizedError } from "../utils/errors/unauthorized-error.js";
-import { getUserById } from "../services/auth-service.js";
+import { isExistingUserById } from "../repository/user-repository.js";
+
 
 export const verifyJwt = async (
   req: Request,
@@ -28,7 +29,7 @@ export const verifyJwt = async (
     throw new UnauthorizedError("Invalid token", 401);
   }
 
-  const user = await getUserById(decodedToken.id);
+  const user = await isExistingUserById(decodedToken.id);
   if (!user) {
     throw new UnauthorizedError("User doesn't exist", 401);
   }
