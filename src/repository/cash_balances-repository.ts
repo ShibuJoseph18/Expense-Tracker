@@ -20,8 +20,10 @@ export const intializeCashBalance = async (
   }
 };
 
-export const initialDepositCash = async (userId: number, amount: number) => {
-  console.log("user", userId);
+export const initialDepositCashRepository = async (
+  userId: number,
+  amount: number
+): Promise<Boolean> => {
   const alreadyDeposited = await db.get(
     `SELECT initial_deposit FROM cash_balances WHERE user_id = $user_id`,
     {
@@ -29,14 +31,14 @@ export const initialDepositCash = async (userId: number, amount: number) => {
     }
   );
 
-  if (alreadyDeposited && alreadyDeposited.initial_deposit) {
+  if (alreadyDeposited.initial_deposit) {
     return false;
   }
 
   await db.run(
-    `INSERT INTO cash_balances 
-    (user_id, balance, initial_deposit) 
-    VALUES($user_id, $balance, $initial_deposit)`,
+    `UPDATE cash_balances 
+    SET balance = $balance, initial_deposit = $initial_deposit
+    WHERE user_id = $user_id`,
     {
       $user_id: userId,
       $initial_deposit: 1,
