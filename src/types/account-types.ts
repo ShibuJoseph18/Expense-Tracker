@@ -38,3 +38,13 @@ export type accountRepoInputType = Pick<
   | "balance"
   | "initial_deposit"
 >;
+
+export type InitialAccountDepositServiceType = {
+  account_id: number;
+  amount: number;
+};
+
+export const initialAccountDepositSchema = z.object({
+  account_id: z.number().min(1),
+  amount: z.number().min(1),
+});

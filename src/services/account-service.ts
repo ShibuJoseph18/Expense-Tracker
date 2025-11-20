@@ -1,10 +1,14 @@
 import { db } from "../config/db-config.js";
-import { createAccountRepository } from "../repository/account.repository.js";
+import {
+  createAccountRepository,
+  initialDepositAccountRepository,
+} from "../repository/account-repository.js";
 import type {
   accountServiceInputType,
   accountServiceOutputType,
 } from "../types/account-types.js";
 import { ConflictError } from "../utils/errors/conflict-error.js";
+import type { InitialAccountDepositServiceType } from "../types/account-types.js";
 
 export const createAccountService = async (
   userId: number,
@@ -20,4 +24,21 @@ export const createAccountService = async (
   const { created_at, updated_at, ...accountServiceOutput } = accountRepoOutput;
 
   return accountServiceOutput;
+};
+
+export const initialAccountDepositService = async (
+  userId: number,
+  accDesposit: InitialAccountDepositServiceType
+) => {
+  const accountDeposit = await initialDepositAccountRepository(
+    userId,
+    accDesposit.account_id,
+    accDesposit.amount
+  );
+
+  if (!accountDeposit) {
+    throw new ConflictError("Initial account deposit already exists");
+  }
+
+  return "Deposit Success";
 };
