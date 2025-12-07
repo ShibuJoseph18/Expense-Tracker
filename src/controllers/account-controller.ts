@@ -20,7 +20,6 @@ export const initialAccountDepositController = async (
   req: Request,
   res: Response
 ) => {
-  console.log("check1");
   const accountDeposit = await initialAccountDepositService(
     req.accessToken.id,
     req.validatedReqBody

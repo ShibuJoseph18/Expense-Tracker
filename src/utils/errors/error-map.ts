@@ -5,6 +5,7 @@ import { UnauthorizedError } from "./unauthorized-error.js";
 import { ValidationError } from "./validation-error.js";
 
 export const errorMapper = (err: any) => {
+  console.log("Error", err);
   if (
     err instanceof ValidationError ||
     err instanceof UnauthorizedError ||
@@ -13,7 +14,5 @@ export const errorMapper = (err: any) => {
   ) {
     return err;
   }
-
-  console.log(err)
   return new ServerError();
 };
