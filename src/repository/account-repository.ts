@@ -4,6 +4,7 @@ import type {
   accountType,
 } from "../types/account-types.js";
 import { ConflictError } from "../utils/errors/conflict-error.js";
+import { ServerError } from "../utils/errors/server-error.js";
 
 export const createAccountRepository = async (
   account: accountRepoInputType
@@ -90,3 +91,51 @@ export const initialDepositAccountRepository = async (
 
   return true;
 };
+
+export const negativeAccountBalance = async (
+  userId: number,
+  accountId: number,
+  amount: number
+): Promise<Boolean> => {
+  const account = await getAccount(userId, accountId);
+  const newBalance = account.balance - amount;
+  if (newBalance < 0) {
+    return true;
+  }
+  return false;
+};
+
+export const getAccount = async (userId: number, accountId: number) => {
+  const account = await db.get(
+    `SELECT * FROM accounts WHERE user_id = $user_id AND id = $id AND deleted = 0`,
+    {
+      $id: accountId,
+      $user_id: userId,
+    }
+  );
+
+  if (!account) throw new ServerError("Account doesn't exist");
+  return account;
+};
+
+export const updateAccountBalance = async (
+  userId: number,
+  accountId: number,
+  amount: number
+): Promise<accountType> => {
+  const updateBalance = await db.run(
+    `UPDATE accounts SET balance = balance + $balance, updated_at = CURRENT_TIMESTAMP WHERE user_id = $user_id AND id = $id AND deleted = 0`,
+    {
+      $id: accountId,
+      $user_id: userId,
+      $balance: amount,
+    }
+  );
+
+  if (!updateBalance.changes)
+    throw new ServerError("Account balance update failed");
+
+  const updatedBalance = await getAccount(userId, accountId);
+  return updatedBalance;
+};
+
