@@ -1,4 +1,5 @@
 import { db } from "../config/db-config.js";
+import type { UserCategoryType } from "../types/user_categories-types.js";
 
 export const verifyUserCategories = async (
   userId: number,
@@ -26,3 +27,42 @@ export const verifyUserCategories = async (
   return userCategories ? true : false;
 };
 
+export const createUserCategory = async (
+  userId: number,
+  categoryId: number
+): Promise<number | undefined> => {
+  const insertNewUserCategory = await db.run(
+    `
+    INSERT INTO user_categories (user_id, category_id)
+    VALUES($user_id, $category_id)
+    `,
+    {
+      $user_id: userId,
+      $category_id: categoryId,
+    }
+  );
+
+  if (!insertNewUserCategory.changes || !insertNewUserCategory.lastID) {
+    return undefined;
+  }
+  return insertNewUserCategory.lastID;
+};
+
+export const getUserCategoryById = async (
+  userCategoryId: number,
+  userId: number
+): Promise<UserCategoryType | undefined> => {
+  const userCategory = await db.get(
+    `
+    SELECT * FROM user_categories 
+    WHERE id = $id 
+    AND user_id = $user_id 
+    AND deleted = 0
+    `,
+    {
+      $id: userCategoryId,
+      $user_id: userId,
+    }
+  );
+  return userCategory;
+};
