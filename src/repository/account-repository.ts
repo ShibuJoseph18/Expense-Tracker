@@ -1,14 +1,14 @@
 import { db } from "../config/db-config.js";
 import type {
-  accountRepoInputType,
-  accountType,
+  CreateAccountRepoInput,
+  Account,
 } from "../types/account-types.js";
 import { ConflictError } from "../utils/errors/conflict-error.js";
 import { ServerError } from "../utils/errors/server-error.js";
 
 export const createAccountRepository = async (
-  account: accountRepoInputType
-): Promise<accountType> => {
+  account: CreateAccountRepoInput
+): Promise<Account> => {
   const existingAccount = await isAccountExisting(
     account.user_id,
     account.name,
@@ -38,7 +38,7 @@ export const createAccountRepository = async (
   return newAccount;
 };
 
-const isAccountExisting = async (
+export const isAccountExisting = async (
   userId: number,
   name: string,
   accountNumber?: string
@@ -122,7 +122,7 @@ export const updateAccountBalance = async (
   userId: number,
   accountId: number,
   amount: number
-): Promise<accountType> => {
+): Promise<Account> => {
   const updateBalance = await db.run(
     `UPDATE accounts SET balance = balance + $balance, updated_at = CURRENT_TIMESTAMP WHERE user_id = $user_id AND id = $id AND deleted = 0`,
     {
@@ -133,9 +133,8 @@ export const updateAccountBalance = async (
   );
 
   if (!updateBalance.changes)
-    throw new ServerError("Account balance update failed");
+    throw new ServerError("Account balance updation failed");
 
   const updatedBalance = await getAccount(userId, accountId);
   return updatedBalance;
 };
-

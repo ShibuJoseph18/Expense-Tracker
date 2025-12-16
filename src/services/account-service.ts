@@ -4,16 +4,16 @@ import {
   initialDepositAccountRepository,
 } from "../repository/account-repository.js";
 import type {
-  accountServiceInputType,
-  accountServiceOutputType,
+  CreateAccountServiceInput,
+  CreateAccountServiceOutput,
 } from "../types/account-types.js";
 import { ConflictError } from "../utils/errors/conflict-error.js";
 import type { InitialAccountDepositServiceType } from "../types/account-types.js";
 
 export const createAccountService = async (
   userId: number,
-  accountServiceInput: accountServiceInputType
-): Promise<accountServiceOutputType> => {
+  accountServiceInput: CreateAccountServiceInput
+): Promise<CreateAccountServiceOutput> => {
   const accountRepoInput = {
     ...accountServiceInput,
     user_id: userId,
