@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const createCategoryAndUserCategorySchema = z.object({
-  name: z.string(),
+  name: z.string().trim().min(3),
   type: z.enum(["expense", "income"]),
 });
 
