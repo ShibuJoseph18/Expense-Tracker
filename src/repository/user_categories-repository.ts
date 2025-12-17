@@ -48,19 +48,19 @@ export const createUserCategory = async (
   return insertNewUserCategory.lastID;
 };
 
-export const getUserCategoryById = async (
-  userCategoryId: number,
-  userId: number
+export const getUserCategory = async (
+  userId: number,
+  categoryId: number
 ): Promise<UserCategoryType | undefined> => {
   const userCategory = await db.get(
     `
     SELECT * FROM user_categories 
-    WHERE id = $id 
+    WHERE category_id = $category_id 
     AND user_id = $user_id 
     AND deleted = 0
     `,
     {
-      $id: userCategoryId,
+      $category_id: categoryId,
       $user_id: userId,
     }
   );
