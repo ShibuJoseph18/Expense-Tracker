@@ -1,4 +1,4 @@
-import * as z from "zod";
+import z from "zod";
 
 export const accountUserInputSchema = z.object({
   name: z.string(),
@@ -7,7 +7,16 @@ export const accountUserInputSchema = z.object({
   balance: z.number().optional(),
 });
 
-export type accountType = {
+export const initialAccountDepositSchema = z.object({
+  account_id: z.number().min(1),
+  amount: z.number().min(1),
+});
+
+export const getAccountSchema = z.object({
+  account_id: z.number(),
+});
+
+export type Account = {
   id: number;
   user_id: number;
   name: string;
@@ -15,22 +24,23 @@ export type accountType = {
   account_number: string;
   balance: number;
   initial_deposit: 0 | 1;
+  deleted: 0 | 1;
   created_at: Date;
   updated_at: Date;
 };
 
-export type accountServiceInputType = Pick<
-  accountType,
+export type CreateAccountServiceInput = Pick<
+  Account,
   "name" | "bank_name" | "account_number" | "balance"
 >;
 
-export type accountServiceOutputType = Pick<
-  accountType,
+export type CreateAccountServiceOutput = Pick<
+  Account,
   "user_id" | "name" | "bank_name" | "account_number" | "balance"
 >;
 
-export type accountRepoInputType = Pick<
-  accountType,
+export type CreateAccountRepoInput = Pick<
+  Account,
   | "user_id"
   | "name"
   | "bank_name"
@@ -44,7 +54,11 @@ export type InitialAccountDepositServiceType = {
   amount: number;
 };
 
-export const initialAccountDepositSchema = z.object({
-  account_id: z.number().min(1),
-  amount: z.number().min(1),
-});
+export type GetAccountServiceInput = {
+  account_id: Account["id"];
+};
+
+export type GetAccountServiceOutput = Pick<
+  Account,
+  "id" | "user_id" | "name" | "bank_name" | "account_number" | "balance"
+>;

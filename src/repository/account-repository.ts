@@ -1,14 +1,15 @@
 import { db } from "../config/db-config.js";
 import type {
-  accountRepoInputType,
-  accountType,
+  CreateAccountRepoInput,
+  Account,
 } from "../types/account-types.js";
 import { ConflictError } from "../utils/errors/conflict-error.js";
 import { ServerError } from "../utils/errors/server-error.js";
+import { UnauthorizedError } from "../utils/errors/unauthorized-error.js";
 
 export const createAccountRepository = async (
-  account: accountRepoInputType
-): Promise<accountType> => {
+  account: CreateAccountRepoInput
+): Promise<Account> => {
   const existingAccount = await isAccountExisting(
     account.user_id,
     account.name,
@@ -38,7 +39,7 @@ export const createAccountRepository = async (
   return newAccount;
 };
 
-const isAccountExisting = async (
+export const isAccountExisting = async (
   userId: number,
   name: string,
   accountNumber?: string
@@ -98,6 +99,9 @@ export const negativeAccountBalance = async (
   amount: number
 ): Promise<Boolean> => {
   const account = await getAccount(userId, accountId);
+  if (!account) {
+    throw new UnauthorizedError("Account doesn't exist");
+  }
   const newBalance = account.balance - amount;
   if (newBalance < 0) {
     return true;
@@ -105,16 +109,22 @@ export const negativeAccountBalance = async (
   return false;
 };
 
-export const getAccount = async (userId: number, accountId: number) => {
+export const getAccount = async (
+  userId: number,
+  accountId: number
+): Promise<Account | undefined> => {
   const account = await db.get(
-    `SELECT * FROM accounts WHERE user_id = $user_id AND id = $id AND deleted = 0`,
+    `
+    SELECT * FROM accounts 
+    WHERE user_id = $user_id 
+    AND id = $id 
+    AND deleted = 0
+    `,
     {
       $id: accountId,
       $user_id: userId,
     }
   );
-
-  if (!account) throw new ServerError("Account doesn't exist");
   return account;
 };
 
@@ -122,7 +132,7 @@ export const updateAccountBalance = async (
   userId: number,
   accountId: number,
   amount: number
-): Promise<accountType> => {
+): Promise<Account> => {
   const updateBalance = await db.run(
     `UPDATE accounts SET balance = balance + $balance, updated_at = CURRENT_TIMESTAMP WHERE user_id = $user_id AND id = $id AND deleted = 0`,
     {
@@ -133,9 +143,23 @@ export const updateAccountBalance = async (
   );
 
   if (!updateBalance.changes)
-    throw new ServerError("Account balance update failed");
+    throw new ServerError("Account balance updation failed");
 
   const updatedBalance = await getAccount(userId, accountId);
-  return updatedBalance;
+  return updatedBalance!;
 };
 
+export const getAllAccounts = async (userId: number): Promise<Account[]> => {
+  const accounts = await db.all(
+    `
+    SELECT * FROM accounts 
+    WHERE user_id = $user_id  
+    AND deleted = 0
+    `,
+    {
+      $user_id: userId,
+    }
+  );
+
+  return accounts;
+};

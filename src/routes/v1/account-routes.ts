@@ -3,10 +3,13 @@ import { validatePayload } from "../../middlewares/input-validation-middleware.j
 import {
   accountUserInputSchema,
   initialAccountDepositSchema,
+  getAccountSchema,
 } from "../../types/account-types.js";
 import {
   createAccountController,
   initialAccountDepositController,
+  getAccountController,
+  getAllAccountsController,
 } from "../../controllers/account-controller.js";
 import { verifyJwt } from "../../middlewares/jwt-validation-middleware.js";
 
@@ -25,5 +28,9 @@ accountRouter.post(
   validatePayload(initialAccountDepositSchema),
   initialAccountDepositController
 );
+
+accountRouter.get("/:account_id", verifyJwt, getAccountController);
+
+accountRouter.get("/", verifyJwt, getAllAccountsController);
 
 export default accountRouter;
