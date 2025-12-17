@@ -5,6 +5,7 @@ import type {
 } from "../types/account-types.js";
 import { ConflictError } from "../utils/errors/conflict-error.js";
 import { ServerError } from "../utils/errors/server-error.js";
+import { UnauthorizedError } from "../utils/errors/unauthorized-error.js";
 
 export const createAccountRepository = async (
   account: CreateAccountRepoInput
@@ -98,6 +99,9 @@ export const negativeAccountBalance = async (
   amount: number
 ): Promise<Boolean> => {
   const account = await getAccount(userId, accountId);
+  if (!account) {
+    throw new UnauthorizedError("Account doesn't exist");
+  }
   const newBalance = account.balance - amount;
   if (newBalance < 0) {
     return true;
@@ -105,16 +109,22 @@ export const negativeAccountBalance = async (
   return false;
 };
 
-export const getAccount = async (userId: number, accountId: number) => {
+export const getAccount = async (
+  userId: number,
+  accountId: number
+): Promise<Account | undefined> => {
   const account = await db.get(
-    `SELECT * FROM accounts WHERE user_id = $user_id AND id = $id AND deleted = 0`,
+    `
+    SELECT * FROM accounts 
+    WHERE user_id = $user_id 
+    AND id = $id 
+    AND deleted = 0
+    `,
     {
       $id: accountId,
       $user_id: userId,
     }
   );
-
-  if (!account) throw new ServerError("Account doesn't exist");
   return account;
 };
 
@@ -136,5 +146,20 @@ export const updateAccountBalance = async (
     throw new ServerError("Account balance updation failed");
 
   const updatedBalance = await getAccount(userId, accountId);
-  return updatedBalance;
+  return updatedBalance!;
+};
+
+export const getAllAccounts = async (userId: number): Promise<Account[]> => {
+  const accounts = await db.all(
+    `
+    SELECT * FROM accounts 
+    WHERE user_id = $user_id  
+    AND deleted = 0
+    `,
+    {
+      $user_id: userId,
+    }
+  );
+
+  return accounts;
 };

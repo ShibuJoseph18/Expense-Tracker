@@ -12,6 +12,10 @@ export const initialAccountDepositSchema = z.object({
   amount: z.number().min(1),
 });
 
+export const getAccountSchema = z.object({
+  account_id: z.number(),
+});
+
 export type Account = {
   id: number;
   user_id: number;
@@ -20,6 +24,7 @@ export type Account = {
   account_number: string;
   balance: number;
   initial_deposit: 0 | 1;
+  deleted: 0 | 1;
   created_at: Date;
   updated_at: Date;
 };
@@ -49,3 +54,11 @@ export type InitialAccountDepositServiceType = {
   amount: number;
 };
 
+export type GetAccountServiceInput = {
+  account_id: Account["id"];
+};
+
+export type GetAccountServiceOutput = Pick<
+  Account,
+  "id" | "user_id" | "name" | "bank_name" | "account_number" | "balance"
+>;
