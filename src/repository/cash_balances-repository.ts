@@ -1,6 +1,6 @@
 import { db } from "../config/db-config.js";
 import { ServerError } from "../utils/errors/server-error.js";
-import type { CashBalanceType } from "../types/cash_balance-types.js";
+import type { CashBalance } from "../types/cash_balance-types.js";
 
 export const intializeCashBalance = async (
   userId: number
@@ -51,9 +51,7 @@ export const initialDepositCashRepository = async (
   return true;
 };
 
-export const getCashBalance = async (
-  userId: number
-): Promise<CashBalanceType> => {
+export const getCashBalance = async (userId: number): Promise<CashBalance> => {
   const balance = await db.get(
     `SELECT * FROM cash_balances WHERE user_id = $user_id AND deleted = 0`,
     {
@@ -66,7 +64,7 @@ export const getCashBalance = async (
 export const updateCashBalance = async (
   userId: number,
   amount: number
-): Promise<CashBalanceType> => {
+): Promise<CashBalance> => {
   const updateBalance = await db.run(
     `
     UPDATE cash_balances

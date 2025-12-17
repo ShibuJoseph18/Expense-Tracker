@@ -1,9 +1,16 @@
 import { db } from "../config/db-config.js";
-import { initialDepositCashRepository } from "../repository/cash_balances-repository.js";
+import {
+  getCashBalance,
+  initialDepositCashRepository,
+} from "../repository/cash_balances-repository.js";
 import { ConflictError } from "../utils/errors/conflict-error.js";
 import { ServerError } from "../utils/errors/server-error.js";
-import type { InitialCashDepositServiceType } from "../types/cash_balance-types.js";
-initialDepositCashRepository;
+import type {
+  InitialCashDepositService,
+  GetCashBalanceServiceOutput,
+} from "../types/cash_balance-types.js";
+import { UnauthorizedError } from "../utils/errors/unauthorized-error.js";
+import { omitAuditFields } from "../utils/helpers/response-helper.js";
 
 export const intializeCashBalanceService = async (
   userId: number
@@ -27,7 +34,7 @@ export const intializeCashBalanceService = async (
 
 export const initialCashDepositService = async (
   userId: number,
-  initialDepositInput: InitialCashDepositServiceType
+  initialDepositInput: InitialCashDepositService
 ) => {
   const { amount } = initialDepositInput;
   const cashDeposit = await initialDepositCashRepository(userId, amount);
@@ -36,4 +43,15 @@ export const initialCashDepositService = async (
   }
 
   return "Deposit Success";
+};
+
+export const getCashBalanceService = async (
+  userId: number
+): Promise<GetCashBalanceServiceOutput> => {
+  const cashBalance = await getCashBalance(userId);
+  if (!cashBalance) {
+    throw new UnauthorizedError("Cash balance doesn't exist");
+  }
+  const cashBalanceServiceOutput = omitAuditFields(cashBalance);
+  return cashBalanceServiceOutput as GetCashBalanceServiceOutput;
 };

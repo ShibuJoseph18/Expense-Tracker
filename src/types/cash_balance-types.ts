@@ -1,5 +1,5 @@
 import z from "zod";
-export type CashBalanceType = {
+export type CashBalance = {
   id: number;
   user_id: number;
   initial_deposit: 0 | 1;
@@ -9,10 +9,15 @@ export type CashBalanceType = {
   updated_at: Date;
 };
 
-export type InitialCashDepositServiceType = {
+export type InitialCashDepositService = {
   amount: number;
 };
 
 export const initialCashDepositSchema = z.object({
   amount: z.number().min(1),
 });
+
+export type GetCashBalanceServiceOutput = Pick<
+  CashBalance,
+  "id" | "user_id" | "initial_deposit" | "balance"
+>;
