@@ -1,5 +1,8 @@
 import type { Request, Response } from "express";
-import { initialCashDepositService } from "../services/cash_balance-service.js";
+import {
+  initialCashDepositService,
+  getCashBalanceService,
+} from "../services/cash_balance-service.js";
 
 export const initialCashDepositController = async (
   req: Request,
@@ -10,4 +13,12 @@ export const initialCashDepositController = async (
     req.validatedReqBody
   );
   res.status(200).json({ message: `Cash ${deposit}` });
+};
+
+export const getCashBalanceController = async (req: Request, res: Response) => {
+  const cashBalance = await getCashBalanceService(req.accessToken.id);
+  res.status(200).json({
+    message: "Cash balance fetched sucessfully",
+    cash_balance: cashBalance,
+  });
 };
