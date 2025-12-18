@@ -79,7 +79,7 @@ export const getUserByEmail = async (
   return existingUser;
 };
 
-export const getUserById = async (id: string): Promise<User | undefined> => {
+export const getUserById = async (id: number): Promise<User | undefined> => {
   const existingUser = await db.get(
     `
     SELECT * FROM users 
