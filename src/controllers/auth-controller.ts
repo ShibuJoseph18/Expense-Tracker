@@ -10,9 +10,9 @@ export const registerController = async (req: Request, res: Response) => {
 };
 
 export const loginController = async (req: Request, res: Response) => {
-  const user = await loginService(req.validatedReqBody);
+  const accessToken = await loginService(req.validatedReqBody);
   res.status(200).json({
     message: "User logged in successfully",
-    accessToken: user.accessToken,
+    access_token: accessToken,
   });
 };

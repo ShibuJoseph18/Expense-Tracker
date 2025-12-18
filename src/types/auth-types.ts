@@ -1,5 +1,5 @@
 import * as z from "zod";
-import type { UserType } from "./user-types.js";
+import type { User } from "./user-types.js";
 
 export const registerSchema = z.object({
   name: z.string().regex(/^[A-Za-z ]+$/, "Name must contain only letters"),
@@ -13,17 +13,13 @@ export const loginSchema = z.object({
   password: z.string().min(2).max(25),
 });
 
-export type RegisterServiceInputType = Pick<
-  UserType,
+export type RegisterServiceInput = Pick<
+  User,
   "name" | "email" | "password" | "mobile"
 >;
 
-export type RegisterServiceOutputType = Pick<
-  UserType,
-  "name" | "email" | "mobile"
->;
+export type RegisterServiceOutput = Pick<User, "name" | "email" | "mobile">;
 
-export type LoginServiceInputType = Pick<UserType, "email" | "password">;
+export type LoginServiceInput = Pick<User, "email" | "password">;
 
-export type LoginServiceOutputType = { accessToken: string };
-
+export type LoginServiceOutput = string;

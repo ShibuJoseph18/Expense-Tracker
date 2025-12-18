@@ -1,4 +1,4 @@
-export const omitAuditFields = (responseData: any, additionalFields = []) => {
+export const omitAuditFields = (responseData: any, additionalFields:string[] = []) => {
   // Default fields to remove
   const defaultFields = ["created_at", "updated_at", "deleted"];
 

@@ -1,21 +1,20 @@
 import { db } from "../config/db-config.js";
 import { ConflictError } from "../utils/errors/conflict-error.js";
-import type {
-  UserType,
-  UserCreationRepoInputType,
-} from "../types/user-types.js";
+import type { User, UserCreationRepoInput } from "../types/user-types.js";
 
 export const createUserRepository = async (
-  user: UserCreationRepoInputType
-): Promise<UserType> => {
+  user: UserCreationRepoInput
+): Promise<User> => {
   const existingUser = await isExistingUserByEmail(user.email);
   if (existingUser) {
     throw new ConflictError("User already exists");
   }
 
   const newUserInsert = await db.run(
-    `INSERT INTO users (name, email, password, mobile) 
-    VALUES($name, $email, $password, $mobile)`,
+    `
+    INSERT INTO users (name, email, password, mobile) 
+    VALUES($name, $email, $password, $mobile)
+    `,
     {
       $name: user.name,
       $email: user.email,
@@ -24,9 +23,15 @@ export const createUserRepository = async (
     }
   );
 
-  const newUser = await db.get(`SELECT * FROM users WHERE id = $id`, {
-    $id: newUserInsert.lastID,
-  });
+  const newUser = await db.get(
+    `
+    SELECT * FROM users 
+    WHERE id = $id
+    `,
+    {
+      $id: newUserInsert.lastID,
+    }
+  );
 
   return newUser;
 };
@@ -35,7 +40,10 @@ export const isExistingUserByEmail = async (
   email: string
 ): Promise<Boolean> => {
   const existingUser = await db.get(
-    `SELECt id FROM users WHERE email = $email`,
+    `
+    SELECT id FROM users 
+    WHERE email = $email
+    `,
     {
       $email: email,
     }
@@ -44,27 +52,42 @@ export const isExistingUserByEmail = async (
 };
 
 export const isExistingUserById = async (id: number): Promise<Boolean> => {
-  const existingUser = await db.get(`SELECT id FROM users WHERE id = $id`, {
-    $id: id,
-  });
+  const existingUser = await db.get(
+    `
+    SELECT id FROM users 
+    WHERE id = $id
+    `,
+    {
+      $id: id,
+    }
+  );
   return existingUser ? true : false;
 };
 
 export const getUserByEmail = async (
   email: string
-): Promise<UserType | false> => {
+): Promise<User | undefined> => {
   const existingUser = await db.get(
-    `SELECT * FROM users WHERE email = $email`,
+    `
+    SELECT * FROM users 
+    WHERE email = $email
+    `,
     {
       $email: email,
     }
   );
-  return existingUser || false;
+  return existingUser;
 };
 
-export const getUserById = async (id: string): Promise<UserType | false> => {
-  const existingUser = await db.get(`SELECT * FROM users WHERE id = $id`, {
-    $id: id,
-  });
-  return existingUser || false;
+export const getUserById = async (id: string): Promise<User | undefined> => {
+  const existingUser = await db.get(
+    `
+    SELECT * FROM users 
+    WHERE id = $id
+    `,
+    {
+      $id: id,
+    }
+  );
+  return existingUser;
 };

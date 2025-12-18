@@ -5,10 +5,10 @@ import jwt from "jsonwebtoken";
 import config from "../config/config.js";
 import { ConflictError } from "../utils/errors/conflict-error.js";
 import type {
-  RegisterServiceInputType,
-  RegisterServiceOutputType,
-  LoginServiceInputType,
-  LoginServiceOutputType,
+  RegisterServiceInput,
+  RegisterServiceOutput,
+  LoginServiceInput,
+  LoginServiceOutput,
 } from "../types/auth-types.js";
 import { ServerError } from "../utils/errors/server-error.js";
 import { isValidPassword } from "../utils/helpers/auth-helper.js";
@@ -19,10 +19,11 @@ import {
 import { intializeCashBalance } from "../repository/cash_balances-repository.js";
 import { intializeDefaultCategories } from "../repository/categories-repository.js";
 import { intializeDefaultSubCategories } from "../repository/subcategories-repository.js";
+import { omitAuditFields } from "../utils/helpers/response-helper.js";
 
 export const registerService = async (
-  registerServiceInput: RegisterServiceInputType
-): Promise<RegisterServiceOutputType> => {
+  registerServiceInput: RegisterServiceInput
+): Promise<RegisterServiceOutput> => {
   const hashed_password = await bcrypt.hash(
     registerServiceInput.password,
     config.saltRounds
@@ -50,8 +51,8 @@ export const registerService = async (
 };
 
 export const loginService = async (
-  loginServiceInput: LoginServiceInputType
-): Promise<LoginServiceOutputType> => {
+  loginServiceInput: LoginServiceInput
+): Promise<LoginServiceOutput> => {
   const existingUser = await getUserByEmail(loginServiceInput.email);
   if (!existingUser) {
     //Preventive measure for timing attacks
@@ -62,20 +63,17 @@ export const loginService = async (
     throw new UnauthorizedError("User doesn't exist", 401);
   }
 
-  const { password, ...existingUserInfo } = existingUser;
-
   const validPassword = await isValidPassword({
     plainText: loginServiceInput.password,
-    hash: password,
+    hash: existingUser.password,
   });
   if (!validPassword) {
     throw new UnauthorizedError("Invalid password", 401);
   }
 
-  const { created_at, updated_at, ...accessTokenPayload } = existingUserInfo;
+  const accessTokenPayload = omitAuditFields(existingUser, ["password"]);
   const accessToken = jwt.sign(accessTokenPayload, config.jwtSecretKey, {
     expiresIn: "3h",
   });
-  return { accessToken };
+  return accessToken;
 };
-
