@@ -1,4 +1,4 @@
-export type UserType = {
+export type User = {
   id: number;
   name: string;
   email: string;
@@ -10,4 +10,4 @@ export type UserType = {
 };
 
 
-export type UserCreationRepoInputType = Pick<UserType, "name" | "email" | "password"> & Partial<Pick<UserType, "mobile">>
+export type UserCreationRepoInput = Pick<User, "name" | "email" | "password"> & Partial<Pick<User, "mobile">>
