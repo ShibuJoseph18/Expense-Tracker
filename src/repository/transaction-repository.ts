@@ -1,13 +1,13 @@
 import { db } from "../config/db-config.js";
 import type {
-  TransactionType,
+  Transaction,
   CreateTransactionRepoInput,
   GetTransactionRepositoryInput,
 } from "../types/transaction-types.js";
 
 export const createTransactionRepository = async (
   transaction: CreateTransactionRepoInput
-): Promise<TransactionType> => {
+): Promise<Transaction> => {
   const newTransactionInsert = await db.run(
     `INSERT INTO transactions 
     (user_id, type, amount, is_cash, account_id, category_id, subcategory_id, note, date)

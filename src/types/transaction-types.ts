@@ -33,7 +33,7 @@ export const getTransactionSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(10),
 });
 
-export type TransactionType = {
+export type Transaction = {
   id: number;
   user_id: number;
   type: "expense" | "income";
@@ -50,36 +50,19 @@ export type TransactionType = {
 };
 
 export type CreateTransactionServiceInput = Pick<
-  TransactionType,
+  Transaction,
   "type" | "amount" | "is_cash" | "account_id" | "category_id"
 > &
-  Partial<Pick<TransactionType, "subcategory_id" | "note" | "date">>;
-
-export type transactionServiceOutputType = Omit<
-  TransactionType,
-  "created_at" | "updated_at"
-> & {
-  subcategory_id: number | null;
-  note: string | null;
-};
+  Partial<Pick<Transaction, "subcategory_id" | "note" | "date">>;
 
 export type CreateTransactionRepoInput = Pick<
-  TransactionType,
+  Transaction,
   "user_id" | "type" | "amount" | "is_cash" | "category_id" | "date"
 > & {
   // > //   "id" | "created_at" | "updated_at" | "deleted" | "subcategory_id" | "note" //   TransactionType, // Omit<
   subcategory_id: number | null;
   note: string | null;
   account_id: number | null;
-};
-
-export type CreateCashTransactionRepoInput = Pick<
-  TransactionType,
-  "user_id" | "type" | "amount" | "is_cash" | "category_id"
-> & {
-  subcategory_id?: number | null;
-  note?: string | null;
-  date?: Date | null;
 };
 
 export type GetTransactionServiceInput = {
@@ -98,10 +81,7 @@ export type GetTransactionServiceOutput = {
   };
   transaction: {
     count_of_transactions: number;
-    transactions: Omit<
-      TransactionType,
-      "created_at" | "updated_at" | "deleted"
-    >[];
+    transactions: Omit<Transaction, "created_at" | "updated_at" | "deleted">[];
   };
 };
 
