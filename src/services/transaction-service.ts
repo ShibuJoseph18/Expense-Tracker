@@ -1,5 +1,12 @@
-import { createTransactionRepository } from "../repository/transaction-repository.js";
-import type { CreateTransactionServiceInput } from "../types/transaction-types.js";
+import {
+  createTransactionRepository,
+  getTransactions,
+} from "../repository/transaction-repository.js";
+import type {
+  CreateTransactionServiceInput,
+  GetTransactionServiceInput,
+  GetTransactionServiceOutput,
+} from "../types/transaction-types.js";
 import { ServerError } from "../utils/errors/server-error.js";
 import { toSQLiteDate } from "../utils/helpers/date-helper.js";
 import {
@@ -13,6 +20,7 @@ import {
 import { atomicTransaction } from "../utils/helpers/transaction-helper.js";
 import { verifyUserCategories } from "../repository/user_categories-repository.js";
 import { verifyUserSubCategories } from "../repository/user_subcategories-repository.js";
+import { omitAuditFields } from "../utils/helpers/response-helper.js";
 
 export const createTransactionService = async (
   userId: number,
@@ -135,4 +143,34 @@ export const createTransactionService = async (
         }
       }
   }
+};
+
+export const getTransactionService = async (
+  userId: number,
+  getTransactionServiceInput: GetTransactionServiceInput
+): Promise<GetTransactionServiceOutput> => {
+  // Refactor input mathcing the defined type
+  const transactions = await getTransactions(userId, {
+    transactionType: getTransactionServiceInput.transaction_type,
+    entity: getTransactionServiceInput.entity,
+    offset: getTransactionServiceInput.offset,
+    limit: getTransactionServiceInput.limit,
+  });
+
+  const getTransactionServiceOutput = transactions.map((transaction) =>
+    omitAuditFields(transaction)
+  );
+
+  return {
+    filters: {
+      transaction_type: getTransactionServiceInput.transaction_type,
+      entity: getTransactionServiceInput.entity,
+      offset: getTransactionServiceInput.offset,
+      limit: getTransactionServiceInput.limit,
+    },
+    transaction: {
+      count_of_transactions: transactions.length,
+      transactions: getTransactionServiceOutput,
+    },
+  } as GetTransactionServiceOutput;
 };
