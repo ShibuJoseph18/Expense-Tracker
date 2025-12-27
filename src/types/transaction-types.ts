@@ -26,6 +26,13 @@ export const transactionSchema = z.discriminatedUnion("is_cash", [
   cashTransactionSchema,
 ]);
 
+export const getTransactionSchema = z.object({
+  transaction_type: z.enum(["expense", "income"]).optional(),
+  entity: z.enum(["cash", "account"]).optional(),
+  offset: z.coerce.number().int().min(0).default(0),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
+});
+
 export type TransactionType = {
   id: number;
   user_id: number;
@@ -73,4 +80,34 @@ export type CreateCashTransactionRepoInput = Pick<
   subcategory_id?: number | null;
   note?: string | null;
   date?: Date | null;
+};
+
+export type GetTransactionServiceInput = {
+  transaction_type?: "expense" | "income" | undefined;
+  entity?: "cash" | "account" | undefined;
+  offset?: number;
+  limit?: number;
+};
+
+export type GetTransactionServiceOutput = {
+  filters: {
+    transaction_type?: "expense" | "income" | undefined;
+    entity?: "cash" | "account" | undefined;
+    offset?: number | undefined;
+    limit?: number | undefined;
+  };
+  transaction: {
+    count_of_transactions: number;
+    transactions: Omit<
+      TransactionType,
+      "created_at" | "updated_at" | "deleted"
+    >[];
+  };
+};
+
+export type GetTransactionRepositoryInput = {
+  transactionType?: "expense" | "income" | undefined;
+  entity?: "cash" | "account" | undefined;
+  offset?: number | undefined;
+  limit?: number | undefined;
 };
