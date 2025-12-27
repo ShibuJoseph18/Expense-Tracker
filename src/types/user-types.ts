@@ -9,5 +9,10 @@ export type User = {
   deleted: 0 | 1;
 };
 
+export type UserCreationRepoInput = Pick<User, "name" | "email" | "password"> &
+  Partial<Pick<User, "mobile">>;
 
-export type UserCreationRepoInput = Pick<User, "name" | "email" | "password"> & Partial<Pick<User, "mobile">>
+export type GetUserServiceOutput = Pick<
+  User,
+  "id" | "name" | "email" | "mobile"
+>;
