@@ -42,7 +42,7 @@ export const isExistingUserByEmail = async (
   const existingUser = await db.get(
     `
     SELECT id FROM users 
-    WHERE email = $email
+    WHERE email = $email and deleted = 0
     `,
     {
       $email: email,
