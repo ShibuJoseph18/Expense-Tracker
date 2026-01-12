@@ -6,6 +6,7 @@ import cashBalanceRouter from "./cash_balance-routes.js";
 import categoriesRouter from "./categories-routes.js";
 import subcategoriesRouter from "./subcategories-routes.js";
 import userRouter from "./users-routes.js";
+import fundRouter from "./funds-routes.js";
 
 const router = Router();
 
@@ -16,5 +17,6 @@ router.use("/cash", cashBalanceRouter);
 router.use("/categories", categoriesRouter);
 router.use("/subcategories", subcategoriesRouter);
 router.use("/user", userRouter);
+router.use("/fund", fundRouter);
 
 export default router;
