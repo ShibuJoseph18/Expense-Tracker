@@ -103,3 +103,19 @@ CREATE TABLE IF NOT EXISTS transactions (
         (is_cash = 0 AND account_id IS NOT NULL)
     )
 );
+
+CREATE TABLE IF NOT EXISTS funds (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    user_id INTEGER NOT NULL,
+    amount REAL NOT NULL,
+    category_id INTEGER NOT NULL,   
+    subcategory_id INTEGER, 
+    deleted BOOLEAN DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(category_id) REFERENCES categories(id),
+    FOREIGN KEY(subcategory_id) REFERENCES subcategories(id),
+    UNIQUE(name, user_id)
+);
