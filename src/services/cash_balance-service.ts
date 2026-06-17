@@ -11,6 +11,7 @@ import type {
 } from "../types/cash_balance-types.js";
 import { UnauthorizedError } from "../utils/errors/unauthorized-error.js";
 import { omitAuditFields } from "../utils/helpers/response-helper.js";
+import { pendoTrack } from "../utils/pendo-track.js";
 
 export const intializeCashBalanceService = async (
   userId: number
@@ -41,6 +42,10 @@ export const initialCashDepositService = async (
   if (!cashDeposit) {
     throw new ConflictError("Initial cash deposit already exists");
   }
+
+  pendoTrack("initial_cash_deposit_completed", String(userId), {
+    deposit_amount: amount,
+  });
 
   return "Deposit Success";
 };

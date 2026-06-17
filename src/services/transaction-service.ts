@@ -21,6 +21,7 @@ import { atomicTransaction } from "../utils/helpers/transaction-helper.js";
 import { verifyUserCategories } from "../repository/user_categories-repository.js";
 import { verifyUserSubCategories } from "../repository/user_subcategories-repository.js";
 import { omitAuditFields } from "../utils/helpers/response-helper.js";
+import { pendoTrack } from "../utils/pendo-track.js";
 
 export const createTransactionService = async (
   userId: number,
@@ -57,6 +58,19 @@ export const createTransactionService = async (
     account_id: transactionServiceInput.account_id || null,
   };
 
+  const trackTransactionCreated = () => {
+    pendoTrack("transaction_created", String(userId), {
+      transaction_type: transactionServiceInput.type,
+      amount: transactionServiceInput.amount,
+      is_cash: transactionServiceInput.is_cash,
+      category_id: transactionServiceInput.category_id,
+      has_subcategory: Boolean(transactionServiceInput.subcategory_id),
+      has_note: Boolean(transactionServiceInput.note),
+      has_custom_date: Boolean(transactionServiceInput.date),
+      account_id: transactionServiceInput.account_id || 0,
+    });
+  };
+
   switch (transactionServiceInput.type) {
     case "expense":
       switch (transactionServiceInput.is_cash) {
@@ -77,6 +91,7 @@ export const createTransactionService = async (
 
             return { transaction, balance };
           });
+          trackTransactionCreated();
           return newTransaction;
         }
         case 0: {
@@ -103,6 +118,7 @@ export const createTransactionService = async (
 
             return { transaction, balance };
           });
+          trackTransactionCreated();
           return newTransaction;
         }
       }
@@ -122,6 +138,7 @@ export const createTransactionService = async (
 
             return { transaction, balance };
           });
+          trackTransactionCreated();
           return newTransaction;
         }
         case 0: {
@@ -139,6 +156,7 @@ export const createTransactionService = async (
 
             return { transaction, balance };
           });
+          trackTransactionCreated();
           return newTransaction;
         }
       }
@@ -160,6 +178,14 @@ export const getTransactionService = async (
   const getTransactionServiceOutput = transactions.map((transaction) =>
     omitAuditFields(transaction)
   );
+
+  pendoTrack("transactions_filtered", String(userId), {
+    transaction_type_filter: getTransactionServiceInput.transaction_type || "all",
+    entity_filter: getTransactionServiceInput.entity || "all",
+    offset: getTransactionServiceInput.offset || 0,
+    limit: getTransactionServiceInput.limit || 10,
+    results_count: transactions.length,
+  });
 
   return {
     filters: {
