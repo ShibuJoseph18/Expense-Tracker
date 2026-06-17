@@ -12,6 +12,7 @@ import {
 } from "../repository/subcategories-repository.js";
 import { createUserSubCategory } from "../repository/user_subcategories-repository.js";
 import { getUserCategory } from "../repository/user_categories-repository.js";
+import { pendoTrack } from "../utils/pendo-track.js";
 export const createSubCategoryAndUserSubCategoryService = async (
   userId: number,
   subCategoryServiceInput: CreateSubCategoryAndUserSubCategoryServiceInput
@@ -51,6 +52,12 @@ export const createSubCategoryAndUserSubCategoryService = async (
   const subCategory = omitAuditFields(
     newSubCategory
   ) as CreateSubCategoryAndUserSubCategoryServiceOutput;
+
+  pendoTrack("subcategory_created", String(userId), {
+    subcategory_id: subCategory.id,
+    subcategory_name: subCategory.name,
+    parent_category_id: subCategory.category_id,
+  });
 
   return subCategory;
 };

@@ -20,6 +20,7 @@ import { intializeCashBalance } from "../repository/cash_balances-repository.js"
 import { intializeDefaultCategories } from "../repository/categories-repository.js";
 import { intializeDefaultSubCategories } from "../repository/subcategories-repository.js";
 import { omitAuditFields } from "../utils/helpers/response-helper.js";
+import { pendoTrack } from "../utils/pendo-track.js";
 
 export const registerService = async (
   registerServiceInput: RegisterServiceInput
@@ -46,6 +47,11 @@ export const registerService = async (
   if (!userCashBalance) {
     throw new ServerError();
   }
+
+  pendoTrack("user_registered", String(userInfo.id), {
+    user_id: userInfo.id,
+    has_mobile: Boolean(registerServiceInput.mobile),
+  });
 
   return userInfo;
 };
@@ -75,5 +81,11 @@ export const loginService = async (
   const accessToken = jwt.sign(accessTokenPayload, config.jwtSecretKey, {
     expiresIn: "3h",
   });
+
+  pendoTrack("user_logged_in", String(existingUser.id), {
+    user_id: existingUser.id,
+    token_expiry: "3h",
+  });
+
   return accessToken;
 };

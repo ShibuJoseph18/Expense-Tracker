@@ -16,6 +16,7 @@ import { ConflictError } from "../utils/errors/conflict-error.js";
 import { ServerError } from "../utils/errors/server-error.js";
 import { UnauthorizedError } from "../utils/errors/unauthorized-error.js";
 import { omitAuditFields } from "../utils/helpers/response-helper.js";
+import { pendoTrack } from "../utils/pendo-track.js";
 
 export const createFundService = async (
   fundServiceInput: CreateFundServiceInput
@@ -66,6 +67,15 @@ export const createFundService = async (
   });
 
   const createFundServiceOutput = omitAuditFields(newFund);
+
+  pendoTrack("fund_created", String(fundServiceInput.user_id), {
+    fund_id: newFundId,
+    fund_name: fundServiceInput.name,
+    fund_amount: fundServiceInput.amount,
+    category_id: fundServiceInput.category_id,
+    has_subcategory: fundServiceInput.subcategory_id !== undefined,
+  });
+
   return createFundServiceOutput;
 };
 
@@ -96,5 +106,13 @@ export const updateFundService = async (
   });
 
   const fundServiceOutput = omitAuditFields(fund);
+
+  pendoTrack("fund_updated", String(fundServiceInput.user_id), {
+    fund_id: fundServiceInput.id,
+    name_changed: fundServiceInput.name !== undefined,
+    amount_changed: fundServiceInput.amount !== undefined,
+    amount_delta: fundServiceInput.amount || 0,
+  });
+
   return fundServiceOutput as UpdateFundServiceOutput;
 };

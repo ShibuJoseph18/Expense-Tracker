@@ -10,6 +10,7 @@ import type {
   CreateCategoryAndUserCategoryServiceOutput,
 } from "../types/category-types.js";
 import { omitAuditFields } from "../utils/helpers/response-helper.js";
+import { pendoTrack } from "../utils/pendo-track.js";
 
 export const createCategoryAndUserCategoryService = async (
   userId: number,
@@ -43,6 +44,12 @@ export const createCategoryAndUserCategoryService = async (
   const category = omitAuditFields(
     newCategory
   ) as CreateCategoryAndUserCategoryServiceOutput;
+
+  pendoTrack("category_created", String(userId), {
+    category_id: category.id,
+    category_name: category.name,
+    category_type: category.type,
+  });
 
   return category;
 };

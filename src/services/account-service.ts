@@ -15,6 +15,7 @@ import type { InitialAccountDepositServiceType } from "../types/account-types.js
 import { ServerError } from "../utils/errors/server-error.js";
 import { omitAuditFields } from "../utils/helpers/response-helper.js";
 import { UnauthorizedError } from "../utils/errors/unauthorized-error.js";
+import { pendoTrack } from "../utils/pendo-track.js";
 
 export const createAccountService = async (
   userId: number,
@@ -28,6 +29,14 @@ export const createAccountService = async (
   };
   const accountRepoOutput = await createAccountRepository(accountRepoInput);
   const { created_at, updated_at, ...accountServiceOutput } = accountRepoOutput;
+
+  pendoTrack("account_created", String(userId), {
+    account_id: accountServiceOutput.id,
+    has_bank_name: Boolean(accountServiceInput.bank_name),
+    has_account_number: Boolean(accountServiceInput.account_number),
+    has_initial_balance: Boolean(accountServiceInput.balance),
+    initial_balance_amount: accountServiceInput.balance || 0,
+  });
 
   return accountServiceOutput;
 };
@@ -45,6 +54,11 @@ export const initialAccountDepositService = async (
   if (!accountDeposit) {
     throw new ConflictError("Initial account deposit already exists");
   }
+
+  pendoTrack("initial_account_deposit_completed", String(userId), {
+    account_id: accDesposit.account_id,
+    deposit_amount: accDesposit.amount,
+  });
 
   return "Deposit Success";
 };
